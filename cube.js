@@ -287,8 +287,8 @@ positionCamera();
 
 var turning = null;
 var reverse = false;
-var MAX_TURN_TIME = 0.1;
-var CAMERA_SPEED = 1;
+var MAX_TURN_TIME = 0.5;
+var CAMERA_SPEED = 0.02;
 var clock = new THREE.Clock();
 function render() {
     if(keys[RIGHT_KEY] == true) {
