@@ -39,15 +39,15 @@ var UP_KEY = 38;
 var DOWN_KEY = 40;
 var LEFT_KEY = 37;
 var RIGHT_KEY = 39;
-var W_KEY = 87;
 var SHIFT_KEY = 16;
-var S_KEY = 83;
 var F_KEY = 70;
 var B_KEY = 66;
 var R_KEY = 82;
 var L_KEY = 76;
 var D_KEY = 68;
 var U_KEY = 85;
+var X_KEY = 88;
+var Z_KEY = 90;
 
 var camera_theta = Math.PI/4;
 var camera_rho = Math.PI/4;
@@ -75,6 +75,18 @@ function render() {
 	camera_rho += CAMERA_SPEED;
 	if(camera_rho > Math.PI/2)
 	    camera_rho = Math.PI/2;
+	positionCamera();
+    }
+    if(keys[Z_KEY] == true) {
+	camera_radius += 100*CAMERA_SPEED;
+	if(camera_radius > 400)
+	    camera_radius = 400;
+	positionCamera();
+    }
+    if(keys[X_KEY] == true) {
+	camera_radius -= 100*CAMERA_SPEED;
+	if(camera_radius < 100)
+	    camera_radius = 100;
 	positionCamera();
     }
 
