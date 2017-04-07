@@ -46,6 +46,8 @@ function Cube(scene) {
     this.leftInverse = "leftInverse";
     this.back = "back";
     this.backInverse = "backInverse";
+
+    var reverse = false;
     
     var material = new THREE.MeshBasicMaterial(
 	{
@@ -252,6 +254,8 @@ function Cube(scene) {
     this.startTurn = function(turn) {
 	this.clock.start();
 	this.turning = turn;
+	if(turn.indexOf("Inverse") > -1)
+	    reverse = true;
     }
 
     this.continueTurn = function() {
@@ -299,7 +303,6 @@ function Cube(scene) {
     }
 
     this.frontTurn = function() {
-	console.log("Turning front");
 	this.turning = "front";
 
 	var t = this.clock.getElapsedTime();
@@ -332,7 +335,7 @@ function Cube(scene) {
 
     this.frontInverseTurn = function() {
 	this.turning = "frontInverse";
-
+	console.log(reverse);
 	var t = this.clock.getElapsedTime();
 	
 	if(reverse) {
