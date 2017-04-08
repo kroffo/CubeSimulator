@@ -16,7 +16,7 @@ function Cube(scene) {
     var downColor = 0xFFFFFF;
     var leftColor = 0xFFAA00;
     var backColor = 0x00FF00;
-    var internalColor = 0xCCCCCC;
+    var internalColor = 0x000000;
     
     this.corners = [];
     var frontCorners = [ 0, 1, 2, 3 ];
