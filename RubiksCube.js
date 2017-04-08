@@ -9,6 +9,14 @@ function Cube(scene) {
     // The face distance is used to detect what face a
     // mouse click is on in the selectFace function
     var faceDistance = 3/2*CUBIE_WIDTH + SPACING;
+
+    var frontColor = 0x0000FF;
+    var upColor = 0xFFFF00;
+    var rightColor = 0xFF0000;
+    var downColor = 0xFFFFFF;
+    var leftColor = 0xFFAA00;
+    var backColor = 0x00FF00;
+    var internalColor = 0xCCCCCC;
     
     this.corners = [];
     var frontCorners = [ 0, 1, 2, 3 ];
@@ -56,7 +64,7 @@ function Cube(scene) {
     
     var material = new THREE.MeshBasicMaterial(
 	{
-	    color: 0xFFFFFF,
+	    color: downColor,
 	    vertexColors: THREE.FaceColors,
 	}
     );
@@ -68,44 +76,44 @@ function Cube(scene) {
 	var x = 0, y = 0, z = 0;
 	if(leftCorners.includes(i)) {
 	    x = -this.offset;
-	    geometry.faces[2].color.setHex( 0xFFAA00 );
-	    geometry.faces[3].color.setHex( 0xFFAA00 );
-	    geometry.faces[0].color.setHex( 0x000000 );
-	    geometry.faces[1].color.setHex( 0x000000 );
+	    geometry.faces[2].color.setHex( leftColor );
+	    geometry.faces[3].color.setHex( leftColor );
+	    geometry.faces[0].color.setHex( internalColor );
+	    geometry.faces[1].color.setHex( internalColor );
 	} else { // Must be a right corner
 	    x = this.offset
-	    geometry.faces[0].color.setHex( 0xFF0000 );
-	    geometry.faces[1].color.setHex( 0xFF0000 );
-	    geometry.faces[2].color.setHex( 0x000000 );
-	    geometry.faces[3].color.setHex( 0x000000 );
+	    geometry.faces[0].color.setHex( rightColor );
+	    geometry.faces[1].color.setHex( rightColor );
+	    geometry.faces[2].color.setHex( internalColor );
+	    geometry.faces[3].color.setHex( internalColor );
 	}
 	
 	if(downCorners.includes(i)) {
 	    y = -this.offset;
-	    geometry.faces[6].color.setHex( 0x00FF00 );
-	    geometry.faces[7].color.setHex( 0x00FF00 );
-	    geometry.faces[4].color.setHex( 0x000000 );
-	    geometry.faces[5].color.setHex( 0x000000 );
+	    geometry.faces[6].color.setHex( downColor );
+	    geometry.faces[7].color.setHex( downColor );
+	    geometry.faces[4].color.setHex( internalColor );
+	    geometry.faces[5].color.setHex( internalColor );
 	} else { // Must be an up corner
 	    y = this.offset
-	    geometry.faces[4].color.setHex( 0x0000FF );
-	    geometry.faces[5].color.setHex( 0x0000FF );
-	    geometry.faces[6].color.setHex( 0x000000 );
-	    geometry.faces[7].color.setHex( 0x000000 );
+	    geometry.faces[4].color.setHex( upColor );
+	    geometry.faces[5].color.setHex( upColor );
+	    geometry.faces[6].color.setHex( internalColor );
+	    geometry.faces[7].color.setHex( internalColor );
 	}
 	
 	if(frontCorners.includes(i)) {
 	    z = this.offset
-	    geometry.faces[8].color.setHex( 0xFFFFFF );
-	    geometry.faces[9].color.setHex( 0xFFFFFF );
-	    geometry.faces[10].color.setHex( 0x000000 );
-	    geometry.faces[11].color.setHex( 0x000000 );
+	    geometry.faces[8].color.setHex( frontColor );
+	    geometry.faces[9].color.setHex( frontColor );
+	    geometry.faces[10].color.setHex( internalColor );
+	    geometry.faces[11].color.setHex( internalColor );
 	} else { // Must be a back corner
 	    z = -this.offset
-	    geometry.faces[10].color.setHex( 0xFFFF00 );
-	    geometry.faces[11].color.setHex( 0xFFFF00 );
-	    geometry.faces[8].color.setHex( 0x000000 );
-	    geometry.faces[9].color.setHex( 0x000000 );
+	    geometry.faces[10].color.setHex( backColor );
+	    geometry.faces[11].color.setHex( backColor );
+	    geometry.faces[8].color.setHex( internalColor );
+	    geometry.faces[9].color.setHex( internalColor );
 	}
 	cubie.position.set(x, y, z);
 	this.corners[i] = cubie;
@@ -121,62 +129,62 @@ function Cube(scene) {
 	var x = 0, y = 0, z = 0;
 	if(leftEdges.includes(i)) {
 	    x = -this.offset;
-	    geometry.faces[2].color.setHex( 0xFFAA00 );
-	    geometry.faces[3].color.setHex( 0xFFAA00 );
-	    geometry.faces[0].color.setHex( 0x000000 );
-	    geometry.faces[1].color.setHex( 0x000000 );
+	    geometry.faces[2].color.setHex( leftColor );
+	    geometry.faces[3].color.setHex( leftColor );
+	    geometry.faces[0].color.setHex( internalColor );
+	    geometry.faces[1].color.setHex( internalColor );
 	} else if(rightEdges.includes(i)) { 
 	    x = this.offset;
-	    geometry.faces[0].color.setHex( 0xFF0000 );
-	    geometry.faces[1].color.setHex( 0xFF0000 );
-	    geometry.faces[2].color.setHex( 0x000000 );
-	    geometry.faces[3].color.setHex( 0x000000 );
+	    geometry.faces[0].color.setHex( rightColor );
+	    geometry.faces[1].color.setHex( rightColor );
+	    geometry.faces[2].color.setHex( internalColor );
+	    geometry.faces[3].color.setHex( internalColor );
 	} else { // Must be in the vertical middle slice
 	    x = 0;
-	    geometry.faces[0].color.setHex( 0x000000 );
-	    geometry.faces[1].color.setHex( 0x000000 );
-	    geometry.faces[2].color.setHex( 0x000000 );
-	    geometry.faces[3].color.setHex( 0x000000 );
+	    geometry.faces[0].color.setHex( internalColor );
+	    geometry.faces[1].color.setHex( internalColor );
+	    geometry.faces[2].color.setHex( internalColor );
+	    geometry.faces[3].color.setHex( internalColor );
 	}
 	
 	if(downEdges.includes(i)) {
 	    y = -this.offset;
-	    geometry.faces[6].color.setHex( 0x00FF00 );
-	    geometry.faces[7].color.setHex( 0x00FF00 );
-	    geometry.faces[4].color.setHex( 0x000000 );
-	    geometry.faces[5].color.setHex( 0x000000 );
+	    geometry.faces[6].color.setHex( downColor );
+	    geometry.faces[7].color.setHex( downColor );
+	    geometry.faces[4].color.setHex( internalColor );
+	    geometry.faces[5].color.setHex( internalColor );
 	} else if(upEdges.includes(i)) {
 	    y = this.offset;
-	    geometry.faces[4].color.setHex( 0x0000FF );
-	    geometry.faces[5].color.setHex( 0x0000FF );
-	    geometry.faces[6].color.setHex( 0x000000 );
-	    geometry.faces[7].color.setHex( 0x000000 );
+	    geometry.faces[4].color.setHex( upColor );
+	    geometry.faces[5].color.setHex( upColor );
+	    geometry.faces[6].color.setHex( internalColor );
+	    geometry.faces[7].color.setHex( internalColor );
 	} else { // Must be in the horizontal middle slice
 	    y = 0;
-	    geometry.faces[4].color.setHex( 0x000000 );
-	    geometry.faces[5].color.setHex( 0x000000 );
-	    geometry.faces[6].color.setHex( 0x000000 );
-	    geometry.faces[7].color.setHex( 0x000000 );
+	    geometry.faces[4].color.setHex( internalColor );
+	    geometry.faces[5].color.setHex( internalColor );
+	    geometry.faces[6].color.setHex( internalColor );
+	    geometry.faces[7].color.setHex( internalColor );
 	}
 	
 	if(frontEdges.includes(i)) {
 	    z = this.offset;
-	    geometry.faces[8].color.setHex( 0xFFFFFF );
-	    geometry.faces[9].color.setHex( 0xFFFFFF );
-	    geometry.faces[10].color.setHex( 0x000000 );
-	    geometry.faces[11].color.setHex( 0x000000 );
+	    geometry.faces[8].color.setHex( frontColor );
+	    geometry.faces[9].color.setHex( frontColor );
+	    geometry.faces[10].color.setHex( internalColor );
+	    geometry.faces[11].color.setHex( internalColor );
 	} else if(backEdges.includes(i)) {
 	    z = -this.offset;
-	    geometry.faces[10].color.setHex( 0xFFFF00 );
-	    geometry.faces[11].color.setHex( 0xFFFF00 );
-	    geometry.faces[8].color.setHex( 0x000000 );
-	    geometry.faces[9].color.setHex( 0x000000 );
+	    geometry.faces[10].color.setHex( backColor );
+	    geometry.faces[11].color.setHex( backColor );
+	    geometry.faces[8].color.setHex( internalColor );
+	    geometry.faces[9].color.setHex( internalColor );
 	} else { // Must be in the last middle slice
 	    z = 0;
-	    geometry.faces[8].color.setHex( 0x000000 );
-	    geometry.faces[9].color.setHex( 0x000000 );
-	    geometry.faces[10].color.setHex( 0x000000 );
-	    geometry.faces[11].color.setHex( 0x000000 );
+	    geometry.faces[8].color.setHex( internalColor );
+	    geometry.faces[9].color.setHex( internalColor );
+	    geometry.faces[10].color.setHex( internalColor );
+	    geometry.faces[11].color.setHex( internalColor );
 	}
 	cubie.position.set(x, y, z);
 	this.edges[i] = cubie;
@@ -192,62 +200,62 @@ function Cube(scene) {
 	var x = 0, y = 0, z = 0;
 	if(leftCenters.includes(i)) {
 	    x = -this.offset;
-	    geometry.faces[2].color.setHex( 0xFFAA00 );
-	    geometry.faces[3].color.setHex( 0xFFAA00 );
-	    geometry.faces[0].color.setHex( 0x000000 );
-	    geometry.faces[1].color.setHex( 0x000000 );
+	    geometry.faces[2].color.setHex( leftColor );
+	    geometry.faces[3].color.setHex( leftColor );
+	    geometry.faces[0].color.setHex( internalColor );
+	    geometry.faces[1].color.setHex( internalColor );
 	} else if(rightCenters.includes(i)) { 
 	    x = this.offset;
-	    geometry.faces[0].color.setHex( 0xFF0000 );
-	    geometry.faces[1].color.setHex( 0xFF0000 );
-	    geometry.faces[2].color.setHex( 0x000000 );
-	    geometry.faces[3].color.setHex( 0x000000 );
+	    geometry.faces[0].color.setHex( rightColor );
+	    geometry.faces[1].color.setHex( rightColor );
+	    geometry.faces[2].color.setHex( internalColor );
+	    geometry.faces[3].color.setHex( internalColor );
 	} else { // Must be in the vertical middle slice
 	    x = 0;
-	    geometry.faces[0].color.setHex( 0x000000 );
-	    geometry.faces[1].color.setHex( 0x000000 );
-	    geometry.faces[2].color.setHex( 0x000000 );
-	    geometry.faces[3].color.setHex( 0x000000 );
+	    geometry.faces[0].color.setHex( internalColor );
+	    geometry.faces[1].color.setHex( internalColor );
+	    geometry.faces[2].color.setHex( internalColor );
+	    geometry.faces[3].color.setHex( internalColor );
 	}
 	
 	if(downCenters.includes(i)) {
 	    y = -this.offset;
-	    geometry.faces[6].color.setHex( 0x00FF00 );
-	    geometry.faces[7].color.setHex( 0x00FF00 );
-	    geometry.faces[4].color.setHex( 0x000000 );
-	    geometry.faces[5].color.setHex( 0x000000 );
+	    geometry.faces[6].color.setHex( downColor );
+	    geometry.faces[7].color.setHex( downColor );
+	    geometry.faces[4].color.setHex( internalColor );
+	    geometry.faces[5].color.setHex( internalColor );
 	} else if(upCenters.includes(i)) {
 	    y = this.offset;
-	    geometry.faces[4].color.setHex( 0x0000FF );
-	    geometry.faces[5].color.setHex( 0x0000FF );
-	    geometry.faces[6].color.setHex( 0x000000 );
-	    geometry.faces[7].color.setHex( 0x000000 );
+	    geometry.faces[4].color.setHex( upColor );
+	    geometry.faces[5].color.setHex( upColor );
+	    geometry.faces[6].color.setHex( internalColor );
+	    geometry.faces[7].color.setHex( internalColor );
 	} else { // Must be in the horizontal middle slice
 	    y = 0;
-	    geometry.faces[4].color.setHex( 0x000000 );
-	    geometry.faces[5].color.setHex( 0x000000 );
-	    geometry.faces[6].color.setHex( 0x000000 );
-	    geometry.faces[7].color.setHex( 0x000000 );
+	    geometry.faces[4].color.setHex( internalColor );
+	    geometry.faces[5].color.setHex( internalColor );
+	    geometry.faces[6].color.setHex( internalColor );
+	    geometry.faces[7].color.setHex( internalColor );
 	}
 	
 	if(frontCenters.includes(i)) {
 	    z = this.offset;
-	    geometry.faces[8].color.setHex( 0xFFFFFF );
-	    geometry.faces[9].color.setHex( 0xFFFFFF );
-	    geometry.faces[10].color.setHex( 0x000000 );
-	    geometry.faces[11].color.setHex( 0x000000 );
+	    geometry.faces[8].color.setHex( frontColor );
+	    geometry.faces[9].color.setHex( frontColor );
+	    geometry.faces[10].color.setHex( internalColor );
+	    geometry.faces[11].color.setHex( internalColor );
 	} else if(backCenters.includes(i)) {
 	    z = -this.offset;
-	    geometry.faces[10].color.setHex( 0xFFFF00 );
-	    geometry.faces[11].color.setHex( 0xFFFF00 );
-	    geometry.faces[8].color.setHex( 0x000000 );
-	    geometry.faces[9].color.setHex( 0x000000 );
+	    geometry.faces[10].color.setHex( backColor );
+	    geometry.faces[11].color.setHex( backColor );
+	    geometry.faces[8].color.setHex( internalColor );
+	    geometry.faces[9].color.setHex( internalColor );
 	} else { // Must be in the last middle slice
 	    z = 0;
-	    geometry.faces[8].color.setHex( 0x000000 );
-	    geometry.faces[9].color.setHex( 0x000000 );
-	    geometry.faces[10].color.setHex( 0x000000 );
-	    geometry.faces[11].color.setHex( 0x000000 );
+	    geometry.faces[8].color.setHex( internalColor );
+	    geometry.faces[9].color.setHex( internalColor );
+	    geometry.faces[10].color.setHex( internalColor );
+	    geometry.faces[11].color.setHex( internalColor );
 	}
 	cubie.position.set(x, y, z);
 	this.centers[i] = cubie;
