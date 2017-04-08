@@ -38,46 +38,50 @@ function onMouseMove( event ) {
 }
 
 function onMouseDown( event ) {
-    // update the picking ray with the camera and mouse position
-    raycaster.setFromCamera( mouse, camera );
-    
-    // calculate objects intersecting the picking ray
-    var intersects = raycaster.intersectObjects( scene.children );
-
-    var distance = 1000000;
-    for(var i=0; i<intersects.length; ++i) {
-	if(intersects[i].distance < distance) {
-	    selectedCubie = intersects[i].object;
-	    selectedFace = cube.selectFace(intersects[i].point);
-	    distance = intersects[i].distance;
+    if(!cube.turning) {
+	// update the picking ray with the camera and mouse position
+	raycaster.setFromCamera( mouse, camera );
+	
+	// calculate objects intersecting the picking ray
+	var intersects = raycaster.intersectObjects( scene.children );
+	
+	var distance = 1000000;
+	for(var i=0; i<intersects.length; ++i) {
+	    if(intersects[i].distance < distance) {
+		selectedCubie = intersects[i].object;
+		selectedFace = cube.selectFace(intersects[i].point);
+		distance = intersects[i].distance;
+	    }
 	}
     }
 }
 
 function onMouseUp( event ) {
-
-    // update the picking ray with the camera and mouse position
-    raycaster.setFromCamera( mouse, camera );
-    
-    // calculate objects intersecting the picking ray
-    var intersects = raycaster.intersectObjects( scene.children );
-
-    var endFace
-    var distance = 1000000;
-    for(var i=0; i<intersects.length; ++i) {
-	if(intersects[i].distance < distance) {
-	    endCubie = intersects[i].object;
-	    endFace = cube.selectFace(intersects[i].point);
-	    distance = intersects[i].distance;
+    if(!cube.turning) {
+	// update the picking ray with the camera and mouse position
+	raycaster.setFromCamera( mouse, camera );
+	
+	// calculate objects intersecting the picking ray
+	var intersects = raycaster.intersectObjects( scene.children );
+	
+	var endFace = null;
+	var endCubie = null;;
+	var distance = 1000000;
+	for(var i=0; i<intersects.length; ++i) {
+	    if(intersects[i].distance < distance) {
+		endCubie = intersects[i].object;
+		endFace = cube.selectFace(intersects[i].point);
+		distance = intersects[i].distance;
+	    }
 	}
+	
+	var turn = cube.calculateTurn(selectedFace, selectedCubie, endFace, endCubie);
+	if(turn != null)
+	    cube.startTurn(turn);
+	
+	selectedCubie = null;
+	selectedFace = null;
     }
-
-    var turn = cube.calculateTurn(selectedFace, selectedCubie, endFace, endCubie);
-    if(turn != null)
-	cube.startTurn(turn);
-
-    selectedCubie = null;
-    selectedFace = null;
 }
 
 var pointLight = new THREE.PointLight(0xffffff, 1);
