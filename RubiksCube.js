@@ -3,7 +3,12 @@ const SPACING = 0.5;
 const TURNING_RADIUS = (CUBIE_WIDTH + SPACING)*Math.SQRT2;
 
 function Cube(scene) {
+    // A clock is used for timing turns
     this.clock = new THREE.Clock();
+
+    // The face distance is used to detect what face a
+    // mouse click is on in the selectFace function
+    var faceDistance = 3/2*CUBIE_WIDTH + SPACING;
     
     this.corners = [];
     var frontCorners = [ 0, 1, 2, 3 ];
@@ -936,6 +941,989 @@ function Cube(scene) {
 	
 	
 	this.centers[5].rotation.z = theta;
+    }
+
+    this.selectFace = function(point) {
+	var x = point.x;
+	var y = point.y;
+	var z = point.z;
+	var absX = Math.abs(Math.abs(x) - faceDistance);
+	var absY = Math.abs(Math.abs(y) - faceDistance);
+	var absZ = Math.abs(Math.abs(z) - faceDistance);
+	switch(Math.min(absX, absY, absZ)) {
+	case absX:
+	    if(x < 0) {
+		return "L";
+	    } else {
+		return "R";
+	    }
+	    break;
+	case absY:
+	    if(y < 0) {
+		return "D";
+	    } else {
+		return "U";
+	    }
+	    break;
+	case absZ:
+	    if(z < 0) {
+		return "B";
+	    } else {
+		return "F";
+	    }
+	default:
+	    return null;
+	}	
+    }
+
+
+    // Returns the type of turn to execute based on the clicked face, clicked piece, face
+    // on which the click was released, and piece on which the click was released
+    this.calculateTurn = function(selectedFace, selectedCubie, endFace, endCubie) {
+	switch(selectedFace) {
+	case "F":
+	    switch(selectedCubie) {
+	    case this.centers[0]:
+		if(endCubie === selectedCubie)
+		    return "front";
+		else
+		    return null;
+	    case this.corners[0]:
+		switch(endFace) {
+		case "U":
+		    return "leftInverse";
+		case "L":
+		    return "up";
+		case "D":
+		    return "left";
+		case "R":
+		    return "upInverse";
+		case "F":
+		    // Compare to position added to the cubie width / 2 to account for rounding errors
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "upInverse";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "left";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[1]:
+		switch(endFace) {
+		case "U":
+		    return "right";
+		case "L":
+		    return "up";
+		case "D":
+		    return "rightInverse";
+		case "R":
+		    return "upInverse";
+		case "F":
+		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "up";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "rightInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[2]:
+		switch(endFace) {
+		case "U":
+		    return "right";
+		case "L":
+		    return "downInverse";
+		case "D":
+		    return "rightInverse";
+		case "R":
+		    return "down";
+		case "F":
+		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "downInverse";
+		    else if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "right";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.corners[3]:
+		switch(endFace) {
+		case "U":
+		    return "leftInverse";
+		case "L":
+		    return "downInverse";
+		case "D":
+		    return "left";
+		case "R":
+		    return "down";
+		case "F":
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "down";
+		    else if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "leftInverse";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.edges[0]:
+		switch(endFace) {
+		case "L":
+		    return "up";
+		case "R":
+		    return "upInverse";
+		case "F":
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "upInverse";
+		    else if (endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "up";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.edges[1]:
+		switch(endFace) {
+		case "U":
+		    return "right";
+		case "D":
+		    return "rightInverse";
+		case "F":
+		    if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "right";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "rightInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+
+	    case this.edges[2]:
+		switch(endFace) {
+		case "L":
+		    return "downInverse";
+		case "R":
+		    return "down";
+		case "F":
+		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "downInverse";
+		    else if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "down";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+
+	    case this.edges[3]:
+		switch(endFace) {
+		case "U":
+		    return "leftInverse";
+		case "D":
+		    return "left";
+		case "F":
+		    if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "leftInverse";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "left";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    default:
+		return null;
+	    }
+	case "U":
+	    switch(selectedCubie) {
+	    case this.centers[1]:
+		if(endCubie = selectedCubie)
+		    return "up";
+		else
+		    return null;
+	    case this.corners[4]:
+		switch(endFace) {
+		case "B":
+		    return "leftInverse";
+		case "L":
+		    return "back";
+		case "F":
+		    return "left";
+		case "R":
+		    return "backInverse";
+		case "U":
+		    // Compare to position added to the cubie width / 2 to account for rounding errors
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "backInverse";
+		    else if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "left";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[5]:
+		switch(endFace) {
+		case "B":
+		    return "right";
+		case "L":
+		    return "back";
+		case "F":
+		    return "rightInverse";
+		case "R":
+		    return "backInverse";
+		case "U":
+		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "back";
+		    else if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "rightInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[1]:
+		switch(endFace) {
+		case "B":
+		    return "right";
+		case "L":
+		    return "frontInverse";
+		case "F":
+		    return "rightInverse";
+		case "R":
+		    return "front";
+		case "U":
+		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "frontInverse";
+		    else if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "right";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.corners[0]:
+		switch(endFace) {
+		case "B":
+		    return "leftInverse";
+		case "L":
+		    return "frontInverse";
+		case "F":
+		    return "left";
+		case "R":
+		    return "front";
+		case "U":
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "front";
+		    else if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "leftInverse";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.edges[8]:
+		switch(endFace) {
+		case "L":
+		    return "back";
+		case "R":
+		    return "backInverse";
+		case "U":
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "backInverse";
+		    else if (endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "back";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.edges[5]:
+		switch(endFace) {
+		case "B":
+		    return "right";
+		case "F":
+		    return "rightInverse";
+		case "U":
+		    if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "right";
+		    else if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "rightInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+
+	    case this.edges[0]:
+		switch(endFace) {
+		case "L":
+		    return "frontInverse";
+		case "R":
+		    return "front";
+		case "U":
+		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "frontInverse";
+		    else if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "front";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+
+	    case this.edges[4]:
+		switch(endFace) {
+		case "B":
+		    return "leftInverse";
+		case "F":
+		    return "left";
+		case "U":
+		    if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "leftInverse";
+		    else if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "left";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    default:
+		return null;
+	    }
+	case "R":
+	    switch(selectedCubie) {
+	    case this.centers[2]:
+		if(endCubie === selectedCubie)
+		    return "right";
+		else
+		    return null;
+	    case this.corners[1]:
+		switch(endFace) {
+		case "B":
+		    return "upInverse";
+		case "D":
+		    return "front";
+		case "F":
+		    return "up";
+		case "U":
+		    return "frontInverse";
+		case "R":
+		    // Compare to position added to the cubie width / 2 to account for rounding errors
+		    if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "upInverse";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "front";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[5]:
+		switch(endFace) {
+		case "B":
+		    return "upInverse";
+		case "D":
+		    return "backInverse";
+		case "F":
+		    return "up";
+		case "U":
+		    return "back";
+		case "R":
+		    if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "up";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "backInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[6]:
+		switch(endFace) {
+		case "B":
+		    return "down";
+		case "D":
+		    return "backInverse";
+		case "F":
+		    return "downInverse";
+		case "U":
+		    return "back";
+		case "R":
+		    if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "downInverse";
+		    else if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "back";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.corners[2]:
+		switch(endFace) {
+		case "B":
+		    return "down";
+		case "D":
+		    return "front";
+		case "F":
+		    return "downInverse";
+		case "U":
+		    return "frontInverse";
+		case "R":
+		    if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "down";
+		    else if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "frontInverse";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.edges[5]:
+		switch(endFace) {
+		case "B":
+		    return "upInverse";
+		case "F":
+		    return "up";
+		case "R":
+		    if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "upInverse";
+		    else if (endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "up";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.edges[9]:
+		switch(endFace) {
+		case "U":
+		    return "back"
+		case "D":
+		    return "backInverse";
+		case "R":
+		    if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "backInverse";
+		    else if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "back";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+
+	    case this.edges[6]:
+		switch(endFace) {
+		case "B":
+		    return "down";
+		case "F":
+		    return "downInverse";
+		case "R":
+		    if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "down";
+		    else if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "downInverse";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+
+	    case this.edges[1]:
+		switch(endFace) {
+		case "U":
+		    return "frontInverse";
+		case "D":
+		    return "front";
+		case "R":
+		    if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "frontInverse";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "front";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    default:
+		return null;
+	    }
+	case "D":
+	    switch(selectedCubie) {
+	    case this.centers[3]:
+		if(endCubie === selectedCubie)
+		    return "down";
+		else
+		    return null;
+	    case this.corners[3]:
+		switch(endFace) {
+		case "F":
+		    return "leftInverse";
+		case "L":
+		    return "front";
+		case "B":
+		    return "left";
+		case "R":
+		    return "frontInverse";
+		case "D":
+		    // Compare to position added to the cubie width / 2 to account for rounding errors
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "frontInverse";
+		    else if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "left";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[2]:
+		switch(endFace) {
+		case "F":
+		    return "right";
+		case "L":
+		    return "front";
+		case "B":
+		    return "rightInverse";
+		case "R":
+		    return "frontInverse";
+		case "D":
+		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "front";
+		    else if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "rightInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[6]:
+		switch(endFace) {
+		case "F":
+		    return "right";
+		case "L":
+		    return "backInverse";
+		case "B":
+		    return "rightInverse";
+		case "R":
+		    return "back";
+		case "D":
+		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "backInverse";
+		    else if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "right";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.corners[7]:
+		switch(endFace) {
+		case "F":
+		    return "leftInverse";
+		case "L":
+		    return "backInverse";
+		case "B":
+		    return "left";
+		case "R":
+		    return "back";
+		case "D":
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "back";
+		    else if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "leftInverse";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.edges[2]:
+		switch(endFace) {
+		case "R":
+		    return "frontInverse";
+		case "L":
+		    return "front";
+		case "D":
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "frontInverse";
+		    else if (endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "front";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.edges[6]:
+		switch(endFace) {
+		case "F":
+		    return "right";
+		case "B":
+		    return "rightInverse";
+		case "D":
+		    if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "right";
+		    else if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "rightInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+
+	    case this.edges[10]:
+		switch(endFace) {
+		case "R":
+		    return "back";
+		case "L":
+		    return "backInverse";
+		case "D":
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "back";
+		    else if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "backInverse";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+
+	    case this.edges[7]:
+		switch(endFace) {
+		case "F":
+		    return "leftInverse";
+		case "B":
+		    return "left";
+		case "D":
+		    if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "leftInverse";
+		    else if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "left";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    default:
+		return null;
+	    }
+	case "L":
+	    switch(selectedCubie) {
+	    case this.centers[4]:
+		if(endCubie === selectedCubie)
+		    return "left";
+		else
+		    return null;
+	    case this.corners[4]:
+		switch(endFace) {
+		case "U":
+		    return "backInverse";
+		case "B":
+		    return "up";
+		case "D":
+		    return "back";
+		case "F":
+		    return "upInverse"
+		case "L":
+		    // Compare to position added to the cubie width / 2 to account for rounding errors
+		    if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "upInverse";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "back";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[0]:
+		switch(endFace) {
+		case "U":
+		    return "front";
+		case "B":
+		    return "up";
+		case "D":
+		    return "frontInverse";
+		case "F":
+		    return "upInverse";
+		case "L":
+		    if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "up";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "frontInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[3]:
+		switch(endFace) {
+		case "U":
+		    return "front";
+		case "B":
+		    return "downInverse";
+		case "D":
+		    return "frontInverse";
+		case "F":
+		    return "down";
+		case "L":
+		    if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "downInverse";
+		    else if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "front";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.corners[7]:
+		switch(endFace) {
+		case "U":
+		    return "backInverse";
+		case "B":
+		    return "downInverse"
+		case "D":
+		    return "back";
+		case "F":
+		    return "down";
+		case "L":
+		    if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "down";
+		    else if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "backInverse";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.edges[4]:
+		switch(endFace) {
+		case "B":
+		    return "up";
+		case "F":
+		    return "upInverse";
+		case "L":
+		    if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "up";
+		    else if (endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "upInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.edges[3]:
+		switch(endFace) {
+		case "U":
+		    return "front";
+		case "D":
+		    return "frontInverse";
+		case "R":
+		    if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "front";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "frontInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+
+	    case this.edges[7]:
+		switch(endFace) {
+		case "B":
+		    return "downInverse";
+		case "F":
+		    return "down";
+		case "L":
+		    if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+			return "downInverse";
+		    else if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+			return "down";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+
+	    case this.edges[11]:
+		switch(endFace) {
+		case "U":
+		    return "backInverse";
+		case "D":
+		    return "back";
+		case "L":
+		    if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "backInverse";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "back";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    default:
+		return null;
+	    }
+	case "B":
+	    switch(selectedCubie) {
+	    case this.centers[5]:
+		if(endCubie === selectedCubie)
+		    return "back";
+		else
+		    return null;
+	    case this.corners[5]:
+		switch(endFace) {
+		case "U":
+		    return "rightInverse";
+		case "L":
+		    return "upInverse";
+		case "D":
+		    return "right";
+		case "R":
+		    return "up";
+		case "B":
+		    // Compare to position added to the cubie width / 2 to account for rounding errors
+		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "upInverse";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "right";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[4]:
+		switch(endFace) {
+		case "U":
+		    return "left";
+		case "L":
+		    return "upInverse";
+		case "D":
+		    return "leftInverse";
+		case "R":
+		    return "up";
+		case "B":
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "up";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "leftInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.corners[7]:
+		switch(endFace) {
+		case "U":
+		    return "left";
+		case "L":
+		    return "down";
+		case "D":
+		    return "leftInverse";
+		case "R":
+		    return "downInverse";
+		case "B":
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "downInverse";
+		    else if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "left";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.corners[6]:
+		switch(endFace) {
+		case "U":
+		    return "rightInverse";
+		case "L":
+		    return "down";
+		case "D":
+		    return "right";
+		case "R":
+		    return "downInverse";
+		case "B":
+		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "down";
+		    else if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "rightInverse";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    case this.edges[8]:
+		switch(endFace) {
+		case "L":
+		    return "upInverse";
+		case "R":
+		    return "up";
+		case "B":
+		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "up";
+		    else if (endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "upInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+	    case this.edges[11]:
+		switch(endFace) {
+		case "U":
+		    return "left";
+		case "D":
+		    return "leftInverse";
+		case "B":
+		    if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "left";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "leftInverse";
+		    else
+			return null;
+		default:
+		    return null;
+		}
+
+	    case this.edges[10]:
+		switch(endFace) {
+		case "L":
+		    return "down";
+		case "R":
+		    return "downInverse";
+		case "B":
+		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
+			return "down";
+		    else if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
+			return "downInverse";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+
+	    case this.edges[9]:
+		switch(endFace) {
+		case "U":
+		    return "rightInverse";
+		case "D":
+		    return "right";
+		case "B":
+		    if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
+			return "rightInverse";
+		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
+			return "right";
+		    else
+			return null;		    
+		default:
+		    return null;
+		}
+	    default:
+		return null;
+	    }	    
+	}
     }
 }
 
