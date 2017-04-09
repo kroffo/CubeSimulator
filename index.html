@@ -1,6 +1,24 @@
 <html>
   <head>
-    <title>Cube Simulator</title>
-    <meta http-equiv="refresh" content="0; URL=http://kroffo.github.io/CubeSimulator/cube.html"> 
+    
   </head>
+  <body>
+
+    <script src=three.min.js></script>
+    <script src=helvetikerReader.js></script>
+    
+    
+    <div id="settings" style="height:25x">
+      Camera speed: <input type="range" id="cameraSpeedSlider" value="20" min="10">
+      Turn speed: <input type="range" id="turnSpeedSlider" value="500" min="0" max="925">
+      Face Labels: <input type="checkbox" id="labelsCheckbox" checked="true">
+      <button id="scrambleButton">Scramble</button>
+      <br/>
+    </div>
+    <canvas id="myCanvas"></canvas>
+
+    <script src=RubiksCube.js></script>
+    <script src=scene.js></script>
+    
+  </body>
 </html>
