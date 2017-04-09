@@ -95,6 +95,72 @@ function onMouseUp( event ) {
     }
 }
 
+// If the cube isn't turning, then get some info for the start of this click/drag event
+function onTouchDown(event) {
+    event.preventDefault();
+    if(!cube.turning) {
+	var touch = event.touches[0];
+	var touchLocation = {
+	    x: touch.pageX,
+	    y: touch.pageY
+	}
+	// update the picking ray with the camera and mouse position
+	raycaster.setFromCamera( touch, camera );
+	
+	// calculate objects intersecting the picking ray
+	var intersects = raycaster.intersectObjects( scene.children );
+	
+	var distance = 1000000;
+	// Take the nearest intersection. Multiple occur because objects
+	// exist behind the selected cubie.
+	for(var i=0; i<intersects.length; ++i) {
+	    if(intersects[i].distance < distance) {
+		selectedCubie = intersects[i].object;
+		selectedFace = cube.selectFace(intersects[i].point);
+		distance = intersects[i].distance;
+	    }
+	}
+    }
+}
+
+// If the cube isn't turning, finish a click/drag event
+function onTouchUp( event ) {
+    event.preventDefault();
+    if(!cube.turning) {
+	var touch = event.touches[0];
+	var touchLocation = {
+	    x: touch.pageX,
+	    y: touch.pageY
+	}
+	// update the picking ray with the camera and mouse position
+	raycaster.setFromCamera( touchLocation, camera );
+	
+	// calculate objects intersecting the picking ray
+	var intersects = raycaster.intersectObjects( scene.children );
+	
+	var endFace = null;
+	var endCubie = null;;
+	var distance = 1000000;
+	// Take the nearest intersection. Multiple occur because objects
+	// exist behind the selected cubie.
+	for(var i=0; i<intersects.length; ++i) {
+	    if(intersects[i].distance < distance) {
+		endCubie = intersects[i].object;
+		endFace = cube.selectFace(intersects[i].point);
+		distance = intersects[i].distance;
+	    }
+	}
+	
+	// Get the type of turn (if a valid one exists) based on the click/drag event
+	var turn = cube.calculateTurn(selectedFace, selectedCubie, endFace, endCubie);
+	if(turn != null)
+	    cube.startTurn(turn);
+	
+	selectedCubie = null;
+	selectedFace = null;
+    }
+}
+
 var t = 0;
 requestAnimationFrame(render);
 
@@ -213,6 +279,8 @@ function render() {
 window.addEventListener( 'mousemove', onMouseMove, false );
 window.addEventListener( 'mousedown', onMouseDown, false );
 window.addEventListener( 'mouseup', onMouseUp, false );
+window.addEventListener( 'touchdown', onTouchDown, false );
+window.addEventListener( 'touchup', onTouchUp, false );
 
 // Set the camera's position converting spherical coordinates to cartesian coordinates
 function positionCamera() {
