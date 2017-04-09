@@ -1676,7 +1676,7 @@ function Cube(scene) {
 		case "F":
 		    return "down";
 		case "L":
-		    if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+		    if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
 			return "downInverse";
 		    else if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
 			return "front";
@@ -1712,9 +1712,9 @@ function Cube(scene) {
 		case "F":
 		    return "upInverse";
 		case "L":
-		    if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
+		    if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
 			return "up";
-		    else if (endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
+		    else if (endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
 			return "upInverse";
 		    else
 			return null;
@@ -1727,7 +1727,7 @@ function Cube(scene) {
 		    return "front";
 		case "D":
 		    return "frontInverse";
-		case "R":
+		case "L":
 		    if(endCubie.position.y > selectedCubie.position.y + CUBIE_WIDTH/2)
 			return "front";
 		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
