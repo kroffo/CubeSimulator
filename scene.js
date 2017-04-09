@@ -19,25 +19,23 @@ var camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearClip, far
 
 var scene = new THREE.Scene();
 
+// Create the cube!!!
 var cube = new Cube(scene);
 
+// Some variables for clicking and dragging events
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 var selectedFace = null;
 var selectedCubie = null;
 var downPosition = null;
 
-function onMouseMove( event ) {
-    
-    // calculate mouse position in normalized device coordinates
-    // (-1 to +1) for both components
-    
+function onMouseMove(event) {
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    
+    mouse.y = -( event.clientY / window.innerHeight ) * 2 + 1;
 }
 
-function onMouseDown( event ) {
+// If the cube isn't turning, then get some info for the start of this click/drag event
+function onMouseDown(event) {
     if(!cube.turning) {
 	// update the picking ray with the camera and mouse position
 	raycaster.setFromCamera( mouse, camera );
@@ -46,6 +44,8 @@ function onMouseDown( event ) {
 	var intersects = raycaster.intersectObjects( scene.children );
 	
 	var distance = 1000000;
+	// Take the nearest intersection. Multiple occur because objects
+	// exist behind the selected cubie.
 	for(var i=0; i<intersects.length; ++i) {
 	    if(intersects[i].distance < distance) {
 		selectedCubie = intersects[i].object;
@@ -56,6 +56,7 @@ function onMouseDown( event ) {
     }
 }
 
+// If the cube isn't turning, finish a click/drag event
 function onMouseUp( event ) {
     if(!cube.turning) {
 	// update the picking ray with the camera and mouse position
@@ -67,6 +68,8 @@ function onMouseUp( event ) {
 	var endFace = null;
 	var endCubie = null;;
 	var distance = 1000000;
+	// Take the nearest intersection. Multiple occur because objects
+	// exist behind the selected cubie.
 	for(var i=0; i<intersects.length; ++i) {
 	    if(intersects[i].distance < distance) {
 		endCubie = intersects[i].object;
@@ -75,6 +78,7 @@ function onMouseUp( event ) {
 	    }
 	}
 	
+	// Get the type of turn (if a valid one exists) based on the click/drag event
 	var turn = cube.calculateTurn(selectedFace, selectedCubie, endFace, endCubie);
 	if(turn != null)
 	    cube.startTurn(turn);
@@ -84,17 +88,10 @@ function onMouseUp( event ) {
     }
 }
 
-var pointLight = new THREE.PointLight(0xffffff, 1);
-pointLight.position.set(200, 500, 100);
-scene.add(pointLight);
-
-var pointLight = new THREE.PointLight(0xffffff, 1);
-pointLight.position.set(-200, -500, -100);
-scene.add(pointLight);
-
 var t = 0;
 requestAnimationFrame(render);
 
+// Keep track of pressed keys to process input
 var keys = [];
 window.onkeyup = function(e) {keys[e.keyCode]=false;}
 window.onkeydown = function(e) {keys[e.keyCode]=true;}
@@ -112,6 +109,8 @@ var U_KEY = 85;
 var X_KEY = 88;
 var Z_KEY = 90;
 
+// The camera's location is stored in spherical coordinates,
+// because I want the camera to move on a sphere around the cube
 var camera_theta = Math.PI/4;
 var camera_rho = Math.PI/4;
 var camera_radius = 100;
@@ -119,8 +118,10 @@ positionCamera();
 
 var CAMERA_SPEED = 0.02;
 
-function render() {	    
+function render() {
+    // Don't allow moving of the camera during click/drag
     if(!selectedFace) {
+	// Camera controls
 	if(keys[RIGHT_KEY] == true) {
 	    camera_theta += CAMERA_SPEED;
 	    positionCamera();
@@ -154,6 +155,8 @@ function render() {
 	    positionCamera();
 	}
 
+	// Start turns based on input
+	// Don't start a turn while the cube is already turning
 	if(!cube.turning) {
 	    if(keys[F_KEY] == true) {
 		if(keys[SHIFT_KEY] == true)
@@ -186,7 +189,8 @@ function render() {
 		else
 		    cube.startTurn(cube.back);
 	    }
-	} else {
+	} else { // Cube is turning
+	    // Update the animation of the turn for this render cycle
 	    cube.continueTurn();
 	}
     }
@@ -199,6 +203,7 @@ window.addEventListener( 'mousemove', onMouseMove, false );
 window.addEventListener( 'mousedown', onMouseDown, false );
 window.addEventListener( 'mouseup', onMouseUp, false );
 
+// Set the camera's position converting spherical coordinates to cartesian coordinates
 function positionCamera() {
     camera.position.set(camera_radius*Math.cos(camera_rho)*Math.cos(camera_theta), camera_radius*Math.sin(camera_rho), camera_radius*Math.cos(camera_rho)*Math.sin(camera_theta));
     camera.lookAt(new THREE.Vector3(0, 0, 0));

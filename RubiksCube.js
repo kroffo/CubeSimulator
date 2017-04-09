@@ -10,6 +10,7 @@ function Cube(scene) {
     // mouse click is on in the selectFace function
     var faceDistance = 3/2*CUBIE_WIDTH + SPACING;
 
+    // Define the color of each face, and the hidden faces of the blocks
     var frontColor = 0x0000FF;
     var upColor = 0xFFFF00;
     var rightColor = 0xFF0000;
@@ -17,7 +18,15 @@ function Cube(scene) {
     var leftColor = 0xFFAA00;
     var backColor = 0x00FF00;
     var internalColor = 0x000000;
-    
+
+    // corners, edges and centers hold the pieces of the cube
+    // each of the other arrays defined here define the indices
+    // for the pieces which are members of the face named
+    //
+    // For example, front corners contains 0, 1, 2, 3 so
+    // this.corners[0], this.corners[1], this.corners[2]
+    // and this.corners[3] are the corners which reside
+    // on the front face of the cube.
     this.corners = [];
     var frontCorners = [ 0, 1, 2, 3 ];
     var upCorners    = [ 0, 1, 4, 5 ];
@@ -41,12 +50,21 @@ function Cube(scene) {
     var downCenters = [ 3 ];
     var leftCenters = [ 4 ];
     var backCenters = [ 5 ];
-    
+
+    // The distance between the edge of one piece
+    // and the corresponding edge of the next
     this.offset = CUBIE_WIDTH + SPACING;
 
+    // Used to disable input processing while turning
     this.turning = null;
+
+    // The time a turn will take to execute (seconds)
     this.MAX_TURN_TIME = 0.5;
 
+    // The available turn types which callers may use.
+    // This will prevent implementing programmers from
+    // making a spelling error in the string to be
+    // passed in for a turn later
     this.front = "front";
     this.frontInverse = "frontInverse";
     this.up = "up";
@@ -60,20 +78,27 @@ function Cube(scene) {
     this.back = "back";
     this.backInverse = "backInverse";
 
+    // Whether a turn is to be counterclockwise
+    // instead of clockwise
     var reverse = false;
-    
+
+    // The material the pieces are to be created from
     var material = new THREE.MeshBasicMaterial(
 	{
 	    color: downColor,
 	    vertexColors: THREE.FaceColors,
 	}
     );
-    
+
+    // Create the corners, and color them appropriately
     for(var i=0; i<8; ++i) {
 	var geometry = new THREE.BoxGeometry(CUBIE_WIDTH, CUBIE_WIDTH, CUBIE_WIDTH);
 	
 	var cubie = new THREE.Mesh(geometry, material);
 	var x = 0, y = 0, z = 0;
+
+	// Based on the predefined corner location arrays,
+	// create the corners by the faces they are members of!
 	if(leftCorners.includes(i)) {
 	    x = -this.offset;
 	    geometry.faces[2].color.setHex( leftColor );
@@ -118,15 +143,21 @@ function Cube(scene) {
 	cubie.position.set(x, y, z);
 	this.corners[i] = cubie;
     }
-    
+
+    // Add the corners to the scene
     for(var i = 0; i<this.corners.length; ++i)
 	scene.add(this.corners[i]);
-    
+
+
+    // Create the edges, and color them appropriately
     for(var i=0; i<12; ++i) {
 	var geometry = new THREE.BoxGeometry(CUBIE_WIDTH, CUBIE_WIDTH, CUBIE_WIDTH);
 	
 	var cubie = new THREE.Mesh(geometry, material);
 	var x = 0, y = 0, z = 0;
+
+	// Based on the predefined corner location arrays,
+	// create the edges by the faces they are members of!
 	if(leftEdges.includes(i)) {
 	    x = -this.offset;
 	    geometry.faces[2].color.setHex( leftColor );
@@ -189,15 +220,20 @@ function Cube(scene) {
 	cubie.position.set(x, y, z);
 	this.edges[i] = cubie;
     }
-    
+
+    // Add the edges to the scene
     for(var i=0; i<this.edges.length; ++i)
 	scene.add(this.edges[i]);
-    
+
+    // Create the centers, and color them appropriately
     for(var i=0; i<6; ++i) {
 	var geometry = new THREE.BoxGeometry(CUBIE_WIDTH, CUBIE_WIDTH, CUBIE_WIDTH);
 	
 	var cubie = new THREE.Mesh(geometry, material);
 	var x = 0, y = 0, z = 0;
+	
+	// Based on the predefined center location arrays,
+	// create the edges by the faces they are members of!
 	if(leftCenters.includes(i)) {
 	    x = -this.offset;
 	    geometry.faces[2].color.setHex( leftColor );
@@ -261,9 +297,12 @@ function Cube(scene) {
 	this.centers[i] = cubie;
     }
 
+    // Add the centers to the scene
     for(var i=0; i<this.centers.length; ++i)
 	scene.add(this.centers[i]);
 
+    // This function takes in a turn string,
+    // and starts the apropriate turn
     this.startTurn = function(turn) {
 	this.clock.start();
 	this.turning = turn;
@@ -271,6 +310,10 @@ function Cube(scene) {
 	    reverse = true;
     }
 
+    // This function should be called each render
+    // cycle until this.turning is null
+    // This function updates the position of
+    // the cubies being turned.
     this.continueTurn = function() {
 	switch(this.turning) {
 	case cube.front:
@@ -315,11 +358,17 @@ function Cube(scene) {
 	}
     }
 
+    // Call the animation function for a front turn
+    // and switch the piece positions when finished.
     this.frontTurn = function() {
 	this.turning = "front";
 
 	var t = this.clock.getElapsedTime();
-	
+
+	// When the turn is complete, finish the
+	// turn animation and reset setup variables
+	// such as the clock, and the center's rotation
+	// (which is used a reference angle during the turn)
 	if(t >= this.MAX_TURN_TIME) {
 	    this.clock.stop();
 	    this.turning = null;
@@ -346,11 +395,16 @@ function Cube(scene) {
 	}
     }
 
+    // Swap the pieces for a turn in reverse,
+    // then call the regular front turn animation
+    // running backwards in time to give a reverse
+    // effect
     this.frontInverseTurn = function() {
 	this.turning = "frontInverse";
-	console.log(reverse);
+
 	var t = this.clock.getElapsedTime();
-	
+
+	// Swap the turns, then turn off the reverse field
 	if(reverse) {
 	    var corner = this.corners[0];
 	    this.corners[0] = this.corners[1];
@@ -368,7 +422,8 @@ function Cube(scene) {
 	    
 	    reverse = false;
 	}
-	
+
+	// At the end of the turn, finish it
 	if(t >= this.MAX_TURN_TIME) {
 	    this.clock.stop();
 	    this.turning = null;
@@ -381,11 +436,17 @@ function Cube(scene) {
 	}
     }
 
+    // Call the animation function for an up turn
+    // and switch the piece positions when finished.
     this.upTurn = function() {
 	this.turning = "up";
 
 	var t = this.clock.getElapsedTime();
-	
+
+	// When the turn is complete, finish the
+	// turn animation and reset setup variables
+	// such as the clock, and the center's rotation
+	// (which is used a reference angle during the turn)
 	if(t >= this.MAX_TURN_TIME) {
 	    this.clock.stop();
 	    this.turning = null;
@@ -412,11 +473,16 @@ function Cube(scene) {
 	}
     }
 
+    // Swap the pieces for a turn in reverse,
+    // then call the regular up turn animation
+    // running backwards in time to give a reverse
+    // effect
     this.upInverseTurn = function() {
 	this.turning = "upInverse";
 
 	var t = this.clock.getElapsedTime();
 
+	// Swap the turns, then turn off the reverse field
 	if(reverse) {
 	    var corner = this.corners[4];
 	    this.corners[4] = this.corners[5];
@@ -434,7 +500,8 @@ function Cube(scene) {
 
 	    reverse = false;
 	}
-	
+
+	// At the end of the turn, finish it
 	if(t >= this.MAX_TURN_TIME) {
 	    this.clock.stop();
 	    this.turning = null;
@@ -447,11 +514,17 @@ function Cube(scene) {
 	}
     }
 
+    // Call the animation function for a right turn
+    // and switch the piece positions when finished.
     this.rightTurn = function() {
 	this.turning = "right";
 
 	var t = this.clock.getElapsedTime();
-	
+
+	// When the turn is complete, finish the
+	// turn animation and reset setup variables
+	// such as the clock, and the center's rotation
+	// (which is used a reference angle during the turn)
 	if(t >= this.MAX_TURN_TIME) {
 	    this.clock.stop();
 	    this.turning = null;
@@ -477,12 +550,17 @@ function Cube(scene) {
 	    this.animateRightTurn(t);
 	}
     }
-
+    
+    // Swap the pieces for a turn in reverse,
+    // then call the regular right turn animation
+    // running backwards in time to give a reverse
+    // effect
     this.rightInverseTurn = function() {
 	this.turning = "rightInverse";
 
 	var t = this.clock.getElapsedTime();
 
+	// Swap the turns, then turn off the reverse field
 	if(reverse) {
 
 	    var corner = this.corners[1];
@@ -501,7 +579,8 @@ function Cube(scene) {
 
 	    reverse = false;
 	}
-	
+
+	// At the end of the turn, finish it
 	if(t >= this.MAX_TURN_TIME) {
 	    this.clock.stop();
 	    this.turning = null;
@@ -514,11 +593,17 @@ function Cube(scene) {
 	}
     }
 
+    // Call the animation function for a down turn
+    // and switch the piece positions when finished.
     this.downTurn = function() {
 	this.turning = "down";
 
 	var t = this.clock.getElapsedTime();
 	
+	// When the turn is complete, finish the
+	// turn animation and reset setup variables
+	// such as the clock, and the center's rotation
+	// (which is used a reference angle during the turn)
 	if(t >= this.MAX_TURN_TIME) {
 	    this.clock.stop();
 	    this.turning = null;
@@ -544,12 +629,17 @@ function Cube(scene) {
 	    this.animateDownTurn(t);
 	}
     }
-
+    
+    // Swap the pieces for a turn in reverse,
+    // then call the regular down turn animation
+    // running backwards in time to give a reverse
+    // effect
     this.downInverseTurn = function() {
 	this.turning = "downInverse";
 
 	var t = this.clock.getElapsedTime();
 
+	// Swap the turns, then turn off the reverse field
 	if(reverse) {
 	    
 	    var corner = this.corners[3];
@@ -568,7 +658,8 @@ function Cube(scene) {
 
 	    reverse = false;
 	}
-	
+
+	// At the end of the turn, finish it
 	if(t >= this.MAX_TURN_TIME) {
 	    this.clock.stop();
 	    this.turning = null;
@@ -581,11 +672,17 @@ function Cube(scene) {
 	}
     }
 
+    // Call the animation function for a left turn
+    // and switch the piece positions when finished.
     this.leftTurn = function() {
 	this.turning = "left";
 
 	var t = this.clock.getElapsedTime();
-	
+
+	// When the turn is complete, finish the
+	// turn animation and reset setup variables
+	// such as the clock, and the center's rotation
+	// (which is used a reference angle during the turn)
 	if(t >= this.MAX_TURN_TIME) {
 	    this.clock.stop();
 	    this.turning = null;
@@ -612,11 +709,16 @@ function Cube(scene) {
 	}
     }
 
+    // Swap the pieces for a turn in reverse,
+    // then call the regular front turn animation
+    // running backwards in time to give a reverse
+    // effect
     this.leftInverseTurn = function() {
 	this.turning = "leftInverse";
 
 	var t = this.clock.getElapsedTime();
 
+	// Swap the turns, then turn off the reverse field
 	if(reverse) {
 	    
 	    var corner = this.corners[4];
@@ -635,7 +737,8 @@ function Cube(scene) {
 
 	    reverse = false;
 	}
-	
+
+	// At the end of the turn, finish it
 	if(t >= this.MAX_TURN_TIME) {
 	    this.clock.stop();
 	    this.turning = null;
@@ -648,6 +751,8 @@ function Cube(scene) {
 	}
     }
 
+    // Call the animation function for a back turn
+    // and switch the piece positions when finished.
     this.backTurn = function() {
 	this.turning = "back";
 
@@ -679,11 +784,16 @@ function Cube(scene) {
 	}
     }
 
+    // Swap the pieces for a turn in reverse,
+    // then call the regular down turn animation
+    // running backwards in time to give a reverse
+    // effect
     this.backInverseTurn = function() {
 	this.turning = "backInverse";
 
 	var t = this.clock.getElapsedTime();
 
+	// Swap the turns, then turn off the reverse field
 	if(reverse) {
 	    
 	    var corner = this.corners[4];
@@ -702,7 +812,8 @@ function Cube(scene) {
 
 	    reverse = false;
 	}
-	
+
+	// At the end of the turn, finish it
 	if(t >= this.MAX_TURN_TIME) {
 	    this.clock.stop();
 	    this.turning = null;
@@ -715,6 +826,10 @@ function Cube(scene) {
 	}
     }
 
+    // The following six functions animate the actual turns by positioning the appropriate pieces
+    // where they belong, t/MAX_TURN_TIME way through the turn. The angle of the appropriate center
+    // piece is used for reference
+    
     this.animateFrontTurn = function(t) {
 	var x = this.centers[0].position.x + TURNING_RADIUS*Math.cos( (Math.PI/2) * (3/2-t/this.MAX_TURN_TIME) );
 	var y = this.centers[0].position.y + TURNING_RADIUS*Math.sin( (Math.PI/2) * (3/2-t/this.MAX_TURN_TIME) );
@@ -951,6 +1066,9 @@ function Cube(scene) {
 	this.centers[5].rotation.z = theta;
     }
 
+    // Takes a point in R3 and returns what face
+    // the point lies on, or null if it does not
+    // lie on a face
     this.selectFace = function(point) {
 	var x = point.x;
 	var y = point.y;
@@ -985,27 +1103,56 @@ function Cube(scene) {
     }
 
 
-    // Returns the type of turn to execute based on the clicked face, clicked piece, face
-    // on which the click was released, and piece on which the click was released
+    // This function was made to take in information about a click and drag event and determine
+    // what turn should be executed.
+    //
+    // Returns the type of turn to execute based on selectedFace (the clicked face),
+    // selectedCubie (the clicked piece), endFace (the face on which the click was released),
+    // and endCubie (the piece on which the click was released)
+    //
+    // The function looks at selectedFace (6 valid cases), and then selectedCubie (9 valid cases).
+    // Then endFace is checked to determine how to turn the cube
+    //
+    //     6 valid cases for corners [5 faces, 2 direcitons on same face]
+    //     4 valid cases for edges [2 faces, 2 directions on same face]
+    //     1 valid case for centers [click and release on the same center]
+    //
+    // If the end face is the same as the clicked face,
+    // a comparison on the positions of endCubie and selectedCubie is made to determine which direction
+    // a turn should be made
+    //
+    // Overall that makes 6*4*6 + 6*4*4 + 6*1*1 = 246 valid input combinations.
+    // Perhaps there is some way of labelling the pieces which makes this mathematically beautiful, and
+    // a smaller function, but this seems to be good enough for now.
+    //
+    // I have personally tested all 246 cases, and they all worked appropriately (by the end of the testing).
+    //
+    // The first corner, edge and center cases are documented as an example
+    //
     this.calculateTurn = function(selectedFace, selectedCubie, endFace, endCubie) {
 	switch(selectedFace) {
 	case "F":
 	    switch(selectedCubie) {
-	    case this.centers[0]:
-		if(endCubie === selectedCubie)
+	    case this.centers[0]: // This is the first center case, the center of the front face
+		if(endCubie === selectedCubie) // Valid turns for centers only occur when the drag started and ended on the center
 		    return "front";
 		else
 		    return null;
-	    case this.corners[0]:
+	    case this.corners[0]: // This is the first corner case, the top left corner of the front face
+
+		// Based on where the drag ended, determine the type of turn to move the corner to that face
 		switch(endFace) {
 		case "U":
-		    return "leftInverse";
+		    return "leftInverse"; 
 		case "L":
 		    return "up";
 		case "D":
 		    return "left";
 		case "R":
 		    return "upInverse";
+		    
+		// If the drag ends on the same face as it started, see where the piece it ended on is
+		// And make an appropriate turn if it is determinable
 		case "F":
 		    // Compare to position added to the cubie width / 2 to account for rounding errors
 		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
@@ -1077,13 +1224,19 @@ function Cube(scene) {
 		default:
 		    return null;
 		}
-	    case this.edges[0]:
+	    case this.edges[0]: // This is the first edge case, the top edge of the front face
+
+		// Based on where the drag ended, determine the type of turn to move the edge to that face
 		switch(endFace) {
 		case "L":
 		    return "up";
 		case "R":
 		    return "upInverse";
+
+                // If the drag ends on the same face as it started, see where the piece it ended on is
+		// And make an appropriate turn if it is determinable
 		case "F":
+		    // Compare to position added to the cubie width / 2 to account for rounding errors
 		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
 			return "upInverse";
 		    else if (endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
@@ -1164,7 +1317,6 @@ function Cube(scene) {
 		case "R":
 		    return "backInverse";
 		case "U":
-		    // Compare to position added to the cubie width / 2 to account for rounding errors
 		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
 			return "backInverse";
 		    else if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
@@ -1321,7 +1473,6 @@ function Cube(scene) {
 		case "U":
 		    return "frontInverse";
 		case "R":
-		    // Compare to position added to the cubie width / 2 to account for rounding errors
 		    if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
 			return "upInverse";
 		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
@@ -1478,7 +1629,6 @@ function Cube(scene) {
 		case "R":
 		    return "frontInverse";
 		case "D":
-		    // Compare to position added to the cubie width / 2 to account for rounding errors
 		    if(endCubie.position.x > selectedCubie.position.x + CUBIE_WIDTH/2)
 			return "frontInverse";
 		    else if(endCubie.position.z < selectedCubie.position.z - CUBIE_WIDTH/2)
@@ -1635,7 +1785,6 @@ function Cube(scene) {
 		case "F":
 		    return "upInverse"
 		case "L":
-		    // Compare to position added to the cubie width / 2 to account for rounding errors
 		    if(endCubie.position.z > selectedCubie.position.z + CUBIE_WIDTH/2)
 			return "upInverse";
 		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
@@ -1792,7 +1941,6 @@ function Cube(scene) {
 		case "R":
 		    return "up";
 		case "B":
-		    // Compare to position added to the cubie width / 2 to account for rounding errors
 		    if(endCubie.position.x < selectedCubie.position.x - CUBIE_WIDTH/2)
 			return "upInverse";
 		    else if(endCubie.position.y < selectedCubie.position.y - CUBIE_WIDTH/2)
@@ -1936,7 +2084,10 @@ function Cube(scene) {
 }
 
 // Function taken from Three.js github issues
-// Rotate an object around an arbitrary axis in world space       
+// Rotate an object around an arbitrary axis in world space
+//
+// This was needed because by default an object will rotate around
+// its local axes, which change when the object rotates.
 function rotateAroundWorldAxis(object, axis, radians) {
     var rotWorldMatrix = new THREE.Matrix4();
     rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
