@@ -97,6 +97,7 @@ function onMouseUp( event ) {
 
 // If the cube isn't turning, then get some info for the start of this click/drag event
 function onTouchDown(event) {
+    event.preventDefault();
     if(!cube.turning) {
 	var touch = event.touches[0];
 	var touchLocation = {
@@ -124,6 +125,7 @@ function onTouchDown(event) {
 
 // If the cube isn't turning, finish a click/drag event
 function onTouchUp( event ) {
+    event.preventDefault();
     if(!cube.turning) {
 	var touch = event.touches[0];
 	var touchLocation = {
