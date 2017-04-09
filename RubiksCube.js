@@ -2130,6 +2130,10 @@ function Cube(scene) {
 	    }	    
 	}
     }
+
+    this.updateTurnTime = function(time) {
+	this.MAX_TURN_TIME = time;
+    }
 }
 
 // Function taken from Three.js github issues

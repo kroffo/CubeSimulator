@@ -1,7 +1,7 @@
 var renderer = new THREE.WebGLRenderer({canvas: document.getElementById("myCanvas"), antialias: true});
 renderer.setClearColor(0x000000);
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(window.innerWidth-20, window.innerHeight-20);
 
 
 var fieldOfView = 35;
@@ -208,3 +208,14 @@ function positionCamera() {
     camera.position.set(camera_radius*Math.cos(camera_rho)*Math.cos(camera_theta), camera_radius*Math.sin(camera_rho), camera_radius*Math.cos(camera_rho)*Math.sin(camera_theta));
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 }
+
+function updateCameraSpeed() {
+    CAMERA_SPEED = document.getElementById("cameraSpeedSlider").value/1000;
+}
+document.getElementById("cameraSpeedSlider").addEventListener("input", updateCameraSpeed, false);
+
+function updateTurnSpeed() {
+    var time = document.getElementById("turnSpeedSlider").value/1000;
+    cube.updateTurnTime(time);
+}
+document.getElementById("turnSpeedSlider").addEventListener("input", updateTurnSpeed, false);

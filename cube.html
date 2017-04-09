@@ -4,11 +4,19 @@
   </head>
   <body>
 
-    <canvas id="myCanvas"></canvas>
-    
     <script src=three.min.js></script>
     <script src=helvetikerReader.js></script>
+    
+    
+    <div id="settings">
+      Camera speed: <input type="range" id="cameraSpeedSlider" value="20" min="10">
+      Turn speed: <input type="range" id="turnSpeedSlider" value="500" min="1" max="1000">
+      
+    </div>
+    <canvas id="myCanvas"></canvas>
+
     <script src=RubiksCube.js></script>
     <script src=scene.js></script>
+    
   </body>
 </html>
