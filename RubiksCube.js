@@ -2134,6 +2134,24 @@ function Cube(scene) {
     this.updateTurnTime = function(time) {
 	this.MAX_TURN_TIME = time;
     }
+
+    this.showFaceLabels = function() {
+	scene.add(this.frontLabel);
+	scene.add(this.upLabel);
+	scene.add(this.rightLabel);
+	scene.add(this.downLabel);
+	scene.add(this.leftLabel);
+	scene.add(this.backLabel);
+    }
+
+    this.hideFaceLabels = function() {
+	scene.remove(this.frontLabel);
+	scene.remove(this.upLabel);
+	scene.remove(this.rightLabel);
+	scene.remove(this.downLabel);
+	scene.remove(this.leftLabel);
+	scene.remove(this.backLabel);
+    }
 }
 
 // Function taken from Three.js github issues

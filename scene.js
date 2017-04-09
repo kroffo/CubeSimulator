@@ -219,3 +219,11 @@ function updateTurnSpeed() {
     cube.updateTurnTime(time);
 }
 document.getElementById("turnSpeedSlider").addEventListener("input", updateTurnSpeed, false);
+
+function toggleFaceLabels() {
+    if(document.getElementById("labelsCheckbox").checked)
+	cube.showFaceLabels();
+    else
+	cube.hideFaceLabels();
+}
+document.getElementById("labelsCheckbox").addEventListener("click", toggleFaceLabels, false);
