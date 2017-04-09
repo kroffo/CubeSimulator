@@ -12,4 +12,7 @@ To turn the faces of the cube, use standard cube notation:
  
 To execute an inverse turn (counterclockwise) hold shift before pressing the button for the respective face.
 
-Use the arrow keys to move the camera.
+Use the arrow keys to move the camera, and X and Z to zoom in and out.
+
+Alternatively to typing face names, click and drag can be used to manipulate the cube.
+Just make sure the mouse is on a face of the cube at the end of the drag.
