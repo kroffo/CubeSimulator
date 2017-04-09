@@ -18,7 +18,15 @@ function Cube(scene) {
     var leftColor = 0xFFAA00;
     var backColor = 0x00FF00;
     var internalColor = 0x000000;
+    var labelColor = 0x000000;
 
+    // Load the font for face labels
+    var fontJSON = getFontJson();
+    var fontLoader = new THREE.FontLoader();
+    var font = fontLoader.parse(fontJSON);
+    this.labelSize = 4/5*CUBIE_WIDTH;
+    this.labelHeight = 0.3;
+    
     // corners, edges and centers hold the pieces of the cube
     // each of the other arrays defined here define the indices
     // for the pieces which are members of the face named
@@ -301,6 +309,47 @@ function Cube(scene) {
     for(var i=0; i<this.centers.length; ++i)
 	scene.add(this.centers[i]);
 
+    // Create the face labels
+    var labelMaterial = new THREE.MeshBasicMaterial({color: labelColor});
+    var horizontalOffset = -this.labelSize/3;
+    var verticalOffset = -this.labelSize/2;
+    var outwardPosition = 3/2*CUBIE_WIDTH+0.5
+    
+    var frontGeometry = new THREE.TextGeometry("F", {font: font, size: this.labelSize, height: this.labelHeight});
+    this.frontLabel = new THREE.Mesh(frontGeometry, labelMaterial);
+    this.frontLabel.position.set(horizontalOffset, verticalOffset, outwardPosition);
+    scene.add(this.frontLabel);
+
+    var upGeometry = new THREE.TextGeometry("U", {font: font, size: this.labelSize, height: this.labelHeight});
+    this.upLabel = new THREE.Mesh(upGeometry, labelMaterial);
+    this.upLabel.position.set(horizontalOffset, outwardPosition, -verticalOffset);
+    this.upLabel.rotation.x = -Math.PI/2;
+    scene.add(this.upLabel);
+    
+    var rightGeometry = new THREE.TextGeometry("R", {font: font, size: this.labelSize, height: this.labelHeight});
+    this.rightLabel = new THREE.Mesh(rightGeometry, labelMaterial);
+    this.rightLabel.position.set(outwardPosition, verticalOffset, -horizontalOffset);
+    this.rightLabel.rotation.y = Math.PI/2;
+    scene.add(this.rightLabel);
+
+    var downGeometry = new THREE.TextGeometry("D", {font: font, size: this.labelSize, height: this.labelHeight});
+    this.downLabel = new THREE.Mesh(downGeometry, labelMaterial);
+    this.downLabel.position.set(horizontalOffset, -outwardPosition, verticalOffset);
+    this.downLabel.rotation.x = Math.PI/2;
+    scene.add(this.downLabel);
+
+    var leftGeometry = new THREE.TextGeometry("L", {font: font, size: this.labelSize, height: this.labelHeight});
+    this.leftLabel = new THREE.Mesh(leftGeometry, labelMaterial);
+    this.leftLabel.position.set(-outwardPosition, verticalOffset, horizontalOffset);
+    this.leftLabel.rotation.y = -Math.PI/2;
+    scene.add(this.leftLabel);
+
+    var backGeometry = new THREE.TextGeometry("B", {font: font, size: this.labelSize, height: this.labelHeight});
+    this.backLabel = new THREE.Mesh(backGeometry, labelMaterial);
+    this.backLabel.position.set(-horizontalOffset, verticalOffset, -outwardPosition);
+    this.backLabel.rotation.y = Math.PI;
+    scene.add(this.backLabel);
+    
     // This function takes in a turn string,
     // and starts the apropriate turn
     this.startTurn = function(turn) {

@@ -21,7 +21,7 @@ var scene = new THREE.Scene();
 
 // Create the cube!!!
 var cube = new Cube(scene);
-
+    
 // Some variables for clicking and dragging events
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
